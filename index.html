@@ -202,15 +202,15 @@
     top:6px; height:3px;
   }
   .train{
-    position:absolute; bottom:20%; left:-120px;
+    position:absolute; bottom:20%; left:-190px;
     width:150px; height:46px;
     animation:trainmove 4.6s cubic-bezier(.45,0,.3,1) forwards;
     animation-delay:.3s;
   }
   @keyframes trainmove{
-    0%{ left:-120px; }
-    70%{ left:calc(76% - 150px); }
-    100%{ left:calc(85% - 150px); }
+    0%{ left:-190px; }
+    70%{ left:calc(76% - 170px); }
+    100%{ left:calc(85% - 170px); }
   }
   .train-body{
     width:100%; height:36px; background:var(--pink);
@@ -432,12 +432,25 @@
     z-index:5;
   }
   #s4 .hint{ color:rgba(242,239,230,.4); }
+
+  .soundbtn{
+    position:fixed;
+    top:calc(env(safe-area-inset-top,0px) + 14px);
+    left:14px;
+    z-index:100;
+    width:36px; height:36px; border-radius:50%;
+    background:var(--paper); border:2px solid var(--ink);
+    font-size:15px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:2px 2px 0 var(--ink);
+  }
 </style>
 </head>
 <body>
 
 <div class="frame" id="frame">
   <div class="tape"></div>
+  <audio id="bgm" src="song.mp3" loop preload="auto"></audio>
 
   <!-- SCENE 1 — LYON -->
   <div class="scene active" id="s1">
@@ -446,7 +459,7 @@
       <div class="b5"></div><div class="b6"></div><div class="b7"></div><div class="b8"></div><div class="b9"></div>
     </div>
     <div class="ground"></div>
-    <div class="s1-title">LYON, UN MATIN COMME UN AUTRE</div>
+    <div class="s1-title">LYON, UN APRES MIDI COMME UN AUTRE</div>
     <div class="s1-sub">direction... la gare ?</div>
     <div class="skaters">
       <div class="skater him">
@@ -555,7 +568,7 @@
     <div class="confettiwrap" id="confettiwrap"></div>
 
     <div class="giftcard">
-      <h3>Joyeux anniversaire ma chérie 🖤</h3>
+      <h3>Joyeux anniversaire mon amour 🖤</h3>
       <ul>
         <li>🎫 <span><b>Blink-182</b> — [Mardi 15 juin 2027], [DEFENSE ARENA], Paris</span></li>
         <li>🚆 <span>Aller-retour <b>Lyon ⇄ Paris</b> en TGV — [Départ 17h / Retour 8h]</span></li>
@@ -569,12 +582,44 @@
 
 </div>
 
+<button class="soundbtn" id="soundbtn" onclick="toggleMute()">🔊</button>
+
 <script>
   const scenes = document.querySelectorAll('.scene');
   const dotsWrap = null;
   let current = 0;
   let timer = null;
   const durations = [4200, 5200, 3600, 999999]; // ms per scene before auto-advance (scene 4 stays)
+
+  // --- musique de fond ---
+  const bgm = document.getElementById('bgm');
+  const soundbtn = document.getElementById('soundbtn');
+  let musicStarted = false;
+  let isMuted = false;
+  bgm.volume = 0;
+
+  function startMusic(){
+    if(musicStarted) return;
+    musicStarted = true;
+    const playPromise = bgm.play();
+    if(playPromise){ playPromise.catch(()=>{ /* lecture bloquée, on réessaiera au prochain tap */ musicStarted = false; }); }
+    let v = 0;
+    const fade = setInterval(()=>{
+      v += 0.06;
+      bgm.volume = Math.min(v, 0.75);
+      if(v >= 0.75) clearInterval(fade);
+    }, 120);
+  }
+
+  function toggleMute(){
+    isMuted = !isMuted;
+    bgm.muted = isMuted;
+    soundbtn.textContent = isMuted ? '🔇' : '🔊';
+    if(!musicStarted) startMusic();
+  }
+
+  document.addEventListener('click', startMusic, { once:true });
+  document.addEventListener('touchstart', startMusic, { once:true });
 
   function showScene(i){
     scenes.forEach((s,idx)=> s.classList.toggle('active', idx===i));
