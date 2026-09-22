@@ -18,7 +18,7 @@
     --line:#0c0c0e;
     --skin:#f0bd8f;
     --hair:#5b3722;
-    --capcol:#20304a;
+    --capcol:#000000;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -205,11 +205,11 @@
     position:absolute; bottom:20%; left:-190px;
     width:150px; height:46px;
     animation:trainmove 9.2s cubic-bezier(.45,0,.3,1) forwards;
-    animation-delay:.6s;
+    animation-delay:1.6s;
   }
   @keyframes trainmove{
-    0%{ left:-190px; }
-    70%{ left:calc(76% - 170px); }
+    0%{ left:-290px; }
+    70%{ left:calc(76% - 230px); }
     100%{ left:calc(85% - 170px); }
   }
   .train-body{
